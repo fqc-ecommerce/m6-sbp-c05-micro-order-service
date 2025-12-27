@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+# Aquí es donde usas las variables que definimos en el render.yaml
+app:
+  user-service-url: ${USER_SERVICE_URL}
+  product-service-url: ${PRODUCT_SERVICE_URL}
+
+server:
+  port: ${PORT:8083}
