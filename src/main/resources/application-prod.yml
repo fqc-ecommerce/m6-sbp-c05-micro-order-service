@@ -1,16 +1,44 @@
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: validate
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 5
 
-# Aquí es donde usas las variables que definimos en el render.yaml
+  jpa:
+    # FORZAMOS EL DIALECTO AQUÍ
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # Cambiamos a 'none' para evitar que falle buscando tablas de otros micros
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA}
+        # Evita que Hibernate intente consultar metadatos JDBC adicionales al inicio
+        temp.use_jdbc_metadata_defaults: false
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    default-schema: ${DB_SCHEMA}
+    schemas: ${DB_SCHEMA}
+    locations: classpath:db/migration/prod
+
 app:
-  user-service-url: ${USER_SERVICE_URL}
-  product-service-url: ${PRODUCT_SERVICE_URL}
+  # El micro de órdenes consume a ambos
+  user-service-url: ${USER_SERVICE_URL:https://user-service-v7xh.onrender.com/}
+  product-service-url: ${PRODUCT_SERVICE_URL:https://product-service-817l.onrender.com/}
 
 server:
   port: ${PORT:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
